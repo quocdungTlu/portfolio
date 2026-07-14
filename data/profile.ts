@@ -1,5 +1,4 @@
-// TODO: đổi thành domain thật khi deploy (ví dụ https://lqdung.vercel.app)
-export const SITE_URL = "https://lqdung.vercel.app";
+export const SITE_URL = "https://lqdung-portfolio.vercel.app";
 
 export const profile = {
   name: "Lương Quốc Dũng",
