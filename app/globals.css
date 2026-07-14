@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* Dark-only theme — thiết kế cam kết một visual world (Linear/Vercel-style) */
+@theme {
+  --color-background: #0a0a0d;
+  --color-surface: #101014;
+  --color-surface-2: #16161c;
+  --color-foreground: #ededf0;
+  --color-muted: #9d9da8;
+  --color-faint: #64646e;
+  --color-edge: rgba(255, 255, 255, 0.08);
+  --color-edge-strong: rgba(255, 255, 255, 0.14);
+  --color-accent: #10b981;
+  --color-accent-soft: rgba(16, 185, 129, 0.12);
+  --color-accent-2: #22d3ee;
+}
+
+@theme inline {
+  --font-sans: var(--font-app-sans);
+  --font-mono: var(--font-app-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+::selection {
+  background: rgba(16, 185, 129, 0.3);
+}
+
+@layer components {
+  .glass {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--color-edge);
+  }
+  .text-gradient {
+    background: linear-gradient(100deg, #ededf0 20%, #10b981 55%, #22d3ee 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .card-hover {
+    transition:
+      border-color 0.25s ease,
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+  .card-hover:hover {
+    border-color: var(--color-edge-strong);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px -12px rgba(16, 185, 129, 0.15);
+  }
+  /* Lưới nền mờ cho hero */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+}
