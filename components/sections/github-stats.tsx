@@ -1,9 +1,42 @@
+"use client";
+
+import { useState } from "react";
 import { GithubIcon } from "@/components/icons";
 import { profile } from "@/data/profile";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
 import { Counter } from "@/components/motion/counter";
 import { Card } from "@/components/ui/card";
+
+/** Ảnh stat từ dịch vụ third-party (hay bị rate-limit) — ẩn gọn khi lỗi thay vì để icon vỡ */
+function RemoteStatImage({
+  src,
+  alt,
+  className,
+  fallback,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  fallback: string;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return <p className="py-6 text-sm text-faint">{fallback}</p>;
+  }
+
+  // eslint-disable-next-line @next/next/no-img-element
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      className={className}
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 const stats = [
   { to: profile.githubStats.repoCount, suffix: "", label: "public repositories" },
@@ -41,24 +74,22 @@ export function GitHubStats() {
           <Card className="overflow-x-auto">
             <h3 className="mb-4 text-sm font-semibold">Contribution heatmap</h3>
             {/* SVG heatmap từ ghchart — render phía server của họ, chỉ là <img> */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <RemoteStatImage
               src={`https://ghchart.rshah.org/10b981/${u}`}
               alt={`Biểu đồ contribution GitHub của ${u}`}
-              loading="lazy"
               className="w-full min-w-[560px]"
+              fallback="Không tải được contribution heatmap ngay lúc này — xem trực tiếp trên GitHub."
             />
           </Card>
         </Reveal>
         <Reveal delay={0.08}>
           <Card className="flex h-full flex-col">
             <h3 className="mb-4 text-sm font-semibold">Top languages</h3>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <RemoteStatImage
               src={`https://github-readme-stats.vercel.app/api/top-langs/?username=${u}&layout=compact&theme=transparent&hide_border=true&text_color=9d9da8&title_color=ededf0&bg_color=00000000`}
               alt={`Ngôn ngữ dùng nhiều nhất của ${u}`}
-              loading="lazy"
               className="w-full"
+              fallback="Không tải được biểu đồ ngôn ngữ ngay lúc này — xem trực tiếp trên GitHub."
             />
             <a
               href={profile.github}

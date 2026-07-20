@@ -44,7 +44,7 @@ body {
 
 @layer components {
   .glass {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(10, 10, 13, 0.72);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--color-edge);

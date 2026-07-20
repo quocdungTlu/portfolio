@@ -42,7 +42,7 @@ export const profile = {
     detail: "Lead club operations and organize university-wide events.",
   },
   githubStats: {
-    repoCount: 21,
+    repoCount: 24,
     flagshipCommits: 450,
     liveDeployments: 3, // tripnesttravel.online, cdtn-wheat.vercel.app, backend Fly.io
   },
