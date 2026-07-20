@@ -154,6 +154,88 @@ export const projects: Project[] = [
     screenshots: [],
   },
   {
+    slug: "ubndai-tthc-assist",
+    name: "TTHC Assist (UBNDAI)",
+    tagline: "AI hướng dẫn & kiểm tra hồ sơ thủ tục hành chính",
+    role: "Core contributor (team 4 người, hackathon 48h) — OCR pipeline, agent/retrieval, evals, deployment",
+    period: "07/2026",
+    featured: false,
+    summary:
+      "Trợ lý AI cho thủ tục hành chính công: người dân mô tả nhu cầu bằng ngôn ngữ tự nhiên, nhận checklist cá nhân hoá, chụp ảnh giấy tờ để OCR tự điền biểu mẫu, và được kiểm tra hồ sơ trước khi nộp — mọi hướng dẫn đều truy vết được về căn cứ pháp lý.",
+    tech: [
+      "FastAPI",
+      "LangGraph",
+      "Claude Haiku 4.5",
+      "Chroma + BM25 hybrid RAG",
+      "Vision LLM OCR (GPT-5-mini)",
+      "React",
+      "Vite",
+      "TypeScript",
+      "PostgreSQL",
+      "SQLAlchemy",
+      "Alembic",
+      "Docker",
+      "Render",
+      "Vercel",
+    ],
+    links: {
+      github: "https://github.com/quocdungTlu/UBNDAI",
+      demo: "https://c3-tthc-assistant.onrender.com/citizen",
+    },
+    metrics: [
+      { value: "333/334", label: "test suite pass", countTo: 333 },
+      { value: "75", label: "API endpoints", countTo: 75 },
+      { value: "0/60", label: "chốt nhầm thủ tục" },
+      { value: "5·17", label: "thủ tục · rule khai báo" },
+      { value: "~0,016$", label: "chi phí LLM / hồ sơ" },
+    ],
+    overview: [
+      "TTHC Assist (tên nội bộ UBNDAI) là dự án hackathon 48 giờ do một đội 4 người xây dựng: người dân chat mô tả nhu cầu, hệ thống làm rõ và trả về checklist giấy tờ cá nhân hoá, sau đó chụp/scan giấy tờ để OCR tự điền biểu mẫu và kiểm tra hồ sơ trước khi nộp. Cán bộ có dashboard riêng để theo dõi, phân công và nhận cảnh báo bất thường.",
+      "Nguyên tắc sản phẩm xuyên suốt: hệ thống chỉ hỗ trợ hướng dẫn và kiểm tra — cơ quan có thẩm quyền vẫn ra quyết định cuối cùng, và mọi hướng dẫn phải truy vết được về đúng thủ tục/căn cứ pháp lý trong catalog. Nhận diện thủ tục và trả lời câu hỏi pháp luật dùng hai nguồn tách biệt (catalog thủ tục vs. corpus văn bản pháp luật) để tránh AI suy diễn giấy tờ, lệ phí hay thời hạn không có căn cứ.",
+      "Tôi phụ trách OCR pipeline (vision-LLM, đa nhà cung cấp qua env, ngưỡng confidence → needs_human_review), một phần agent/retrieval (hybrid dense+BM25, intent routing), bộ eval nhận diện thủ tục ba-bộ (in-catalog/out-of-catalog/held-out), và pipeline deploy (Docker, Render backend + Vercel frontend rewrite, Alembic auto-migrate).",
+    ],
+    features: [
+      "Chat NL → làm rõ → checklist cá nhân hoá, mỗi câu trả lời về thủ tục đều kèm citation truy vết được nguồn",
+      "OCR vision-LLM đọc cả chữ in lẫn viết tay, structured output + bbox, cache theo hash ảnh, fallback needs_human_review khi confidence thấp",
+      "Sinh bản nháp kết quả thủ tục (PDF/DOCX) theo đúng thể thức pháp lý từng mẫu, luôn có watermark DỰ THẢO — KHÔNG CÓ GIÁ TRỊ PHÁP LÝ",
+      "Rule engine khai báo (YAML) là tầng duy nhất được phát severity=error; AI chỉ được warning/info — cưỡng chế ở tầng kiểu dữ liệu (Pydantic validator), không chỉ dặn trong prompt",
+      "Dashboard cán bộ: theo dõi hồ sơ, tự phân công, xác nhận trường hợp AI chưa chắc chắn",
+    ],
+    challenges: [
+      {
+        problem:
+          "Với thủ tục hành chính, 'chốt nhầm' thủ tục tệ hơn nhiều so với 'không biết' — chốt sai làm hỏng toàn bộ checklist phía sau.",
+        solution:
+          "Thiết kế eval ba bộ tách bạch (in-catalog/out-of-catalog/held-out) thay vì một con số gộp gây đánh lừa; đo riêng tỉ lệ chốt nhầm (đạt 0/60) và độ chính xác nhận diện theo từng bộ để không tự huyễn hoặc bằng eval overfit.",
+      },
+      {
+        problem:
+          "Prompt-only guardrail có thể bị mô hình bỏ qua khi risk cao (hướng dẫn sai có thể khiến người dân xây nhà không phép).",
+        solution:
+          "Đẩy các ràng buộc quan trọng nhất xuống tầng kiểu dữ liệu và schema: AI không thể tạo ValidationIssue với severity=error (Pydantic model_validator ném exception), checklist chỉ sinh từ catalog qua kiến trúc graph — không có đường để LLM tự chèn mục.",
+      },
+      {
+        problem:
+          "Mẫu kết quả thủ tục (VD: Giấy khai sinh) đòi hỏi đúng thể thức pháp lý (font, cỡ chữ, giãn dòng, kích thước bảng theo phụ lục thông tư) — không thể dùng một style chung cho mọi mẫu.",
+        solution:
+          "Mỗi template khai báo docx_style riêng (python-docx, OOXML) theo đúng phụ lục thông tư liên quan, test kiểm trực tiếp các thuộc tính OOXML để tránh lệch định dạng khi renderer thay đổi.",
+      },
+    ],
+    lessons: [
+      "Một con số eval gộp có thể che cả điểm mạnh lẫn điểm yếu — tách bộ theo mục đích đo (index có vỡ không / độ phủ thật / có tổng quát hoá hay chỉ overfit) mới đáng tin.",
+      "Guardrail đáng tin phải nằm ở kiến trúc/kiểu dữ liệu, không phải ở system prompt — đặc biệt với hệ thống có rủi ro thật nếu sai (hành chính công, pháp lý).",
+      "Tài liệu (docs/, ARCHITECTURE.md, eval evidence) cập nhật song song với code giúp bàn giao giữa 4 người không bị lệch trong 48 giờ hackathon.",
+    ],
+    timeline: "Hackathon 48 giờ (07/2026) · team 4 người · deploy Render + Vercel",
+    futureImprovements: [
+      "JWT ownership cho case_id (hiện case_id chưa phải cơ chế auth), rate limit, case expiration, idempotency key trước khi public deployment",
+      "Mở rộng bộ held-out eval để đo tổng quát hoá tốt hơn ngoài 15 câu hiện tại",
+      "SQLite MVP → PostgreSQL production ở nhiều worker hơn (hiện chỉ khuyến nghị 1 worker)",
+    ],
+    // TODO: thêm screenshot dashboard cán bộ / chat citizen vào public/projects/ubndai/*.png rồi khai báo ở đây
+    screenshots: [],
+  },
+  {
     slug: "dpo-alignment-lab",
     name: "DPO / ORPO Alignment Lab",
     tagline: "Fine-tuning Qwen2.5-3B with preference optimization",
